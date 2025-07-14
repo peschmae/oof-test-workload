@@ -1,0 +1,30 @@
+#! /bin/bash
+
+set -e # Exit on error
+set -u # Treat unset variables as an error
+set -o pipefail # Fail on any command in a pipeline that fails
+
+# This script creates a directory and writes a file to it, the base directory is passed as an argument.
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <base_directory>"
+  exit 1
+fi
+
+BASE_DIR="$1"
+TARGET_DIR="$BASE_DIR/new_directory"
+
+# Create the target directory if it does not exist
+mkdir -p "$TARGET_DIR"
+# Write a file to the target directory
+echo "[$( date --rfc-3339=s)] This is a test file." > "$TARGET_DIR/test_file.txt"
+
+# Check if the file was created successfully
+if [ -f "$TARGET_DIR/test_file.txt" ]; then
+  echo "[$( date --rfc-3339=s)] File created successfully at $TARGET_DIR/test_file.txt"
+else
+  echo "[$( date --rfc-3339=s)]  Failed to create file."
+  exit 1
+fi
+
+sleep 600 # Sleep for 10 minutes to keep the script running

@@ -1,0 +1,27 @@
+#! /bin/bash
+set -e # Exit on error
+set -u # Treat unset variables as an error
+set -o pipefail # Fail on any command in a pipeline that fails
+
+# Try to chown an existing file
+if [ -z "$1" ]; then
+  echo "Usage: $0 <file_path>"
+  exit 1
+fi
+
+FILE_PATH="$1"
+# Check if the file exists
+if [ ! -f "$FILE_PATH" ]; then
+  echo "[$( date --rfc-3339=s)] Error: File $FILE_PATH does not exist."
+  exit 1
+fi
+
+# Try to change the ownership of the file
+chown root:root "$FILE_PATH" || {
+  echo "[$( date --rfc-3339=s)] Error: Failed to change ownership of $FILE_PATH"
+  exit 1
+}
+
+echo "[$( date --rfc-3339=s)] Ownership of $FILE_PATH changed to root:root successfully."
+
+sleep 600 # Sleep for 10 minutes to keep the script running

@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oof-test-chown
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test-chown
+  name: test-chown
+  namespace: oof-test-chown
+spec:
+  selector:
+    matchLabels:
+      app: test-chown
+  replicas: 1
+  revisionHistoryLimit: 0
+  template:
+    metadata:
+      labels:
+        app: test-chown
+    spec:
+      containers:
+        - name: test-chown
+          image: ghcr.io/peschmae/oof-test-workload:latest
+          command:
+            - "test_chown"
+          securityContext: {}
+---
+apiVersion: checks.funk.fhnw.ch/v1alpha1
+kind: WorkloadHardeningCheck
+metadata:
+  name: test-chown
+  namespace: oof-test-chown
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: test-chown
+  baselineDuration: 1m

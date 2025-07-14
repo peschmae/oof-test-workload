@@ -1,0 +1,13 @@
+#! /bin/bash
+
+# dump the current process capabilities
+setpriv -d 
+
+if [[ $(setpriv -d | grep "no_new_privs: 1" | wc -l) -eq 1 ]]; then
+    echo "[$( date --rfc-3339=s)] Error: Can't escalate privileges, no_new_privs is enabled."
+    exit 1
+else
+    echo "[$( date --rfc-3339=s)] Privilege escalation is possible."
+fi
+
+sleep 600 # Sleep for 10 minutes to keep the script running

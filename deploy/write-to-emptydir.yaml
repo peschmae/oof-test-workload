@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oof-write-fs-emptydir
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: write-fs-emptydir
+  name: write-fs-emptydir
+  namespace: oof-write-fs-emptydir
+spec:
+  selector:
+    matchLabels:
+      app: write-fs-emptydir
+  replicas: 1
+  revisionHistoryLimit: 0
+  template:
+    metadata:
+      labels:
+        app: write-fs-emptydir
+    spec:
+      containers:
+        - name: write-fs-emptydir
+          image: ghcr.io/peschmae/oof-test-workload:latest
+          command:
+            - "write_to_dir"
+            - "/tmp/"
+          securityContext: {}
+          volumeMounts:
+            - name: tmpdir
+              mountPath: /tmp/
+      volumes:
+        - name: tmpdir
+          emptyDir: {}
+---
+apiVersion: checks.funk.fhnw.ch/v1alpha1
+kind: WorkloadHardeningCheck
+metadata:
+  name: write-fs-emptydir
+  namespace: oof-write-fs-emptydir
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: write-fs-emptydir
+  baselineDuration: 1m

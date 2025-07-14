@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oof-allow-priv-escalation
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: allow-priv-escalation
+  name: allow-priv-escalation
+  namespace: oof-allow-priv-escalation
+spec:
+  selector:
+    matchLabels:
+      app: allow-priv-escalation
+  replicas: 1
+  revisionHistoryLimit: 0
+  template:
+    metadata:
+      labels:
+        app: allow-priv-escalation
+    spec:
+      containers:
+        - name: allow-priv-escalation
+          image: ghcr.io/peschmae/oof-test-workload:latest
+          command:
+            - "try_priv_escalation"
+          securityContext: {}
+---
+apiVersion: checks.funk.fhnw.ch/v1alpha1
+kind: WorkloadHardeningCheck
+metadata:
+  name: allow-priv-escalation
+  namespace: oof-allow-priv-escalation
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: allow-priv-escalation
+  baselineDuration: 1m
